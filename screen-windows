@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+# Author: Scott Jaderholm
+# Created: 2016-03-25
+# License: MIT/X11
+
+# Description:
+# Returns a json map of the screen window numbers to window titles. If
+# no session-name is passed then uses the current session.
+
+# Usage:
+# screen-windows [session-name]
+
+require 'json'
+
+SESSION_NAME="$1"
+WINDOW_LIMIT=50
+# don't check for more windows after seeing this many consequtive empty
+# windows
+EMPTY_LIMIT=20
+# so each command has no delay before returning
+`screen -X msgwait 0`
+
+WINDOWS={}
+empty=0
+
+(0..WINDOW_LIMIT).each do |window_index|
+  title=`screen -x #{SESSION_NAME} -p #{window_index} -Q title`
+  if $?.to_i == 0 then
+    WINDOWS[window_index]=title
+    empty = 0
+  elsif empty >= EMPTY_LIMIT
+    break
+  else
+    empty += 1
+  end
+end
+
+# restore normal timeout
+`screen -x "#{SESSION_NAME}" -X msgwait 5`
+
+puts JSON.generate(WINDOWS)

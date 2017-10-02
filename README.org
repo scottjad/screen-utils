@@ -1,0 +1,21 @@
+* Purpose
+I often end up with dozens of windows open and I would like to close all
+the shell windows that are not currently running a program with a single
+keybinding and have all the window numbers changed to remove gaps.
+
+* Utilities
+** screen-kill-shells
+   Kills all the screen windows where the title start with "zsh" or
+   "bash", except the current window.
+** screen-repack
+Renumbers screen windows so that there are no gaps.
+** screen-windows
+   Utility used by the other to retrieve information (numbers and titles)
+   about the windows in a screen session.
+
+* Usage
+bind R exec screen-repack
+bind K exec screen-kill-shells
+
+* License
+MIT

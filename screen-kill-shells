@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+# Author: Scott Jaderholm
+# Created: 2016-03-25
+# License: MIT/X11
+
+# Description:
+
+# Kills all the screen windows where the title start with "zsh" or
+# "bash", except the current window. When a command is run I change the
+# title, and when there's a background job I change the title to "{1}
+# zsh" so that the window is not killed.
+
+# Usage:
+# screen-kill-shells [session_name]
+
+# To use add something like this to .screenrc:
+# bind K exec screen-kill-shells
+
+require 'json'
+
+TITLES_TO_KILL=/^(zsh|bash|pg|htop|nmtui)/
+
+SESSION_NAME="$1"
+
+WINDOWS_JSON=`screen-windows "#{SESSION_NAME}"`
+WINDOWS=JSON.parse(WINDOWS_JSON)
+
+def kill_window(index)
+  `screen -x #{SESSION_NAME} -p #{index} -X kill`
+end
+
+def current_window
+  `screen -x #{SESSION_NAME} -Q number`.split(" ")[0].to_i
+end
+
+def select_window(number)
+  `screen -x #{SESSION_NAME} -Q select #{number}`
+end
+
+INITIAL_WINDOW=current_window
+
+WINDOWS.each do |index, title|
+  # can't kill the current window or screen kills the exec which is
+  # running this command
+  if index.to_i != INITIAL_WINDOW && TITLES_TO_KILL =~ title then
+    kill_window(index)
+  end
+end
+
+`screen-repack #{SESSION_NAME}`

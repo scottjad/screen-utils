@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+# Author: Scott Jaderholm
+# Created: 2016-03-25
+# License: MIT/X11
+
+# Description:
+# Renumbers screen windows so that there are no gaps.
+
+# Usage:
+# screen-repack [session_name]
+
+# To use add something like this to .screenrc:
+# bind R exec screen-repack
+
+require 'json'
+
+SESSION_NAME="$1"
+
+WINDOWS_JSON=`screen-windows "#{SESSION_NAME}"`
+WINDOWS=JSON.parse(WINDOWS_JSON)
+
+def renumber(old_index, new_index)
+  `screen -x #{SESSION_NAME} -p #{old_index} -Q number #{new_index}`
+end
+
+new_index = 1
+WINDOWS.keys.each do |old_index|
+  if new_index != old_index then
+    renumber(old_index, new_index)
+    new_index += 1
+  end
+end
