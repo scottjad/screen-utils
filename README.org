@@ -14,8 +14,8 @@ Renumbers screen windows so that there are no gaps.
    about the windows in a screen session.
 
 * Usage
-bind R exec screen-repack
-bind K exec screen-kill-shells
+  - bind R exec screen-repack
+  - bind K exec screen-kill-shells
 
 * License
 MIT
